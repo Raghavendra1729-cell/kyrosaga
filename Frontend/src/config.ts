@@ -1,0 +1,22 @@
+interface EnvSettings {
+  apiBaseUrl: string
+  posthogApiKey?: string
+  posthogHost: string
+  storageBaseUrl: string
+}
+
+const getEnvVar = (name: string, isRequired = true): string => {
+  const value = import.meta.env[name]
+  if (!value && isRequired) {
+    throw new Error(`Environment variable ${name} is missing`)
+  }
+  return value || ""
+}
+
+export const settings: EnvSettings = {
+  apiBaseUrl: getEnvVar("VITE_API_BASE_URL"),
+  posthogApiKey: getEnvVar("VITE_POSTHOG_API_KEY", false),
+  posthogHost: getEnvVar("VITE_POSTHOG_HOST"),
+  storageBaseUrl: getEnvVar("VITE_STORAGE_BASE_URL"),
+}
+export default settings

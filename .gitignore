@@ -1,0 +1,13 @@
+Personal/
+.env
+.env.local
+.env.development
+.env.production
+node_modules/
+.venv/
+__pycache__/
+*.pyc
+.supabase/
+dist/
+build/
+local_storage/

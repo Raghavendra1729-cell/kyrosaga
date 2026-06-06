@@ -1,0 +1,16 @@
+{
+  "include": [
+    "Backend/my-fastapi-app"
+  ],
+  "exclude": [
+    "**/node_modules",
+    "**/__pycache__",
+    "Backend/my-fastapi-app/.venv"
+  ],
+  "venvPath": "Backend/my-fastapi-app",
+  "venv": ".venv",
+  "extraPaths": [
+    "Backend/my-fastapi-app"
+  ],
+  "typeCheckingMode": "basic"
+}
