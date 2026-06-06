@@ -3,11 +3,9 @@ from pydantic import Field, model_validator
 from typing import Self
 
 class Settings(BaseSettings):
-    gemini_api_key: str = Field(alias="GEMINI_API_KEY")
-    gemini_flash_model_id: str = Field(alias="GEMINI_FLASH_MODEL_ID")
-    gemini_embedding_model_id: str = Field(alias="GEMINI_EMBEDDING_MODEL_ID")
-    database_url: str = Field(alias="DATABASE_URL")
-    storage_driver: str = Field(alias="STORAGE_DRIVER")
+    gemini_api_key: str = Field(default="", alias="GEMINI_API_KEY")
+    database_url: str = Field(default="", alias="DATABASE_URL")
+    storage_driver: str = Field(default="local", alias="STORAGE_DRIVER")
     
     r2_account_id: str | None = Field(default=None, alias="R2_ACCOUNT_ID")
     r2_access_key_id: str | None = Field(default=None, alias="R2_ACCESS_KEY_ID")
@@ -16,10 +14,13 @@ class Settings(BaseSettings):
     r2_public_url: str | None = Field(default=None, alias="R2_PUBLIC_URL")
     
     posthog_api_key: str | None = Field(default=None, alias="POSTHOG_API_KEY")
-    posthog_host: str = Field(alias="POSTHOG_HOST")
+    posthog_host: str = Field(default="https://us.i.posthog.com", alias="POSTHOG_HOST")
     
-    local_storage_path: str = Field(alias="LOCAL_STORAGE_PATH")
-    local_asset_serve_url: str = Field(alias="LOCAL_ASSET_SERVE_URL")
+    local_storage_path: str = "./local_storage"
+    local_asset_serve_url: str = "http://localhost:8000/static/"
+    
+    gemini_flash_model_id: str = "gemini-3-flash-preview"
+    gemini_embedding_model_id: str = "gemini-embedding-2"
 
     @model_validator(mode="after")
     def validate_r2_credentials(self) -> Self:
