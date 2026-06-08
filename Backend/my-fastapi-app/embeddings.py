@@ -18,11 +18,14 @@ async def generate_product_embedding(
         )
     response = await client.aio.models.embed_content(
         model=settings.gemini_embedding_model_id,
-        contents=contents
+        contents=contents,
+        config=types.EmbedContentConfig(
+            output_dimensionality=1024
+        )
     )
     if not response.embeddings or not response.embeddings[0].values:
         raise ValueError("No embeddings returned")
     embedding = response.embeddings[0].values
-    if len(embedding) != 3072:
-        raise ValueError(f"Expected 3072 dimensions, got {len(embedding)}")
+    if len(embedding) != 1024:
+        raise ValueError(f"Expected 1024 dimensions, got {len(embedding)}")
     return [float(val) for val in embedding]

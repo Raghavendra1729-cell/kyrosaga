@@ -82,9 +82,13 @@ async def sync_node(state: ProductIngestionState) -> dict[str, Any]:
         "shape": state.shape
     }
     attributes_json = json.dumps(attributes_dict)
+    vector_str = None
+    if state.embedding_coordinates:
+        vector_str = f"[{','.join(str(val) for val in state.embedding_coordinates)}]"
+
     query = """
         INSERT INTO products (title, price, inventory_count, image_url, ai_description, extracted_attributes, embedding_coordinates)
-        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        VALUES ($1, $2, $3, $4, $5, $6, $7::vector)
         RETURNING id;
     """
     try:
@@ -96,7 +100,7 @@ async def sync_node(state: ProductIngestionState) -> dict[str, Any]:
             state.optimized_image_url,
             state.ai_description,
             attributes_json,
-            state.embedding_coordinates
+            vector_str
         )
         if not row:
             raise RuntimeError("Failed to insert product record")

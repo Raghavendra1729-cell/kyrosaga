@@ -31,6 +31,9 @@ function App() {
   const [products, setProducts] = useState<Product[]>([])
   const [searchLoading, setSearchLoading] = useState(false)
   const [searchError, setSearchError] = useState<string | null>(null)
+  const [hasSearched, setHasSearched] = useState(false)
+  const [isDragOverSearch, setIsDragOverSearch] = useState(false)
+  const [isDragOverUpload, setIsDragOverUpload] = useState(false)
   
   const [textQuery, setTextQuery] = useState("")
   const [imageQuery, setImageQuery] = useState<File | null>(null)
@@ -58,7 +61,6 @@ function App() {
 
   useEffect(() => {
     fetchStatus()
-    loadInitialProducts()
   }, [])
 
   const fetchStatus = () => {
@@ -106,7 +108,8 @@ function App() {
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!textQuery && !imageQuery) {
-      loadInitialProducts()
+      setProducts([])
+      setHasSearched(false)
       return
     }
     setSearchLoading(true)
@@ -150,9 +153,11 @@ function App() {
       })
       .then((data) => {
         setProducts(data)
+        setHasSearched(true)
       })
       .catch((err) => {
         setSearchError(err instanceof Error ? err.message : "Search failed")
+        setHasSearched(true)
       })
       .finally(() => {
         setSearchLoading(false)
@@ -172,7 +177,7 @@ function App() {
 
     const timer1 = setTimeout(() => setUploadStep("Optimizing image asset to WebP (Node 1)..."), 1000)
     const timer2 = setTimeout(() => setUploadStep("Extracting visual properties & generating description via Gemini 3 Flash (Node 2)..."), 2500)
-    const timer3 = setTimeout(() => setUploadStep("Projecting features into 3072-dimensional vector field (Node 3)..."), 4500)
+    const timer3 = setTimeout(() => setUploadStep("Projecting features into 1024-dimensional vector field (Node 3)..."), 4500)
     const timer4 = setTimeout(() => setUploadStep("Writing records and synchronizing indexes (Node 4)..."), 6000)
 
     const formData = new FormData()
@@ -226,6 +231,50 @@ function App() {
   const handleUploadImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0]
+      setUploadImage(file)
+      setUploadImagePreview(URL.createObjectURL(file))
+    }
+  }
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+  }
+
+  const handleSearchDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    setIsDragOverSearch(true)
+  }
+
+  const handleSearchDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    setIsDragOverSearch(false)
+  }
+
+  const handleSearchImageDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    setIsDragOverSearch(false)
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const file = e.dataTransfer.files[0]
+      setImageQuery(file)
+      setImagePreview(URL.createObjectURL(file))
+    }
+  }
+
+  const handleUploadDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    setIsDragOverUpload(true)
+  }
+
+  const handleUploadDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    setIsDragOverUpload(false)
+  }
+
+  const handleUploadImageDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    setIsDragOverUpload(false)
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const file = e.dataTransfer.files[0]
       setUploadImage(file)
       setUploadImagePreview(URL.createObjectURL(file))
     }
@@ -344,9 +393,17 @@ function App() {
                   ) : (
                     <div
                       onClick={() => searchFileRef.current?.click()}
-                      className="border border-dashed border-neutral-800 hover:border-neutral-700 bg-neutral-950/50 hover:bg-neutral-950 rounded-xl py-3.5 px-4 text-center cursor-pointer transition-all"
+                      onDragOver={handleDragOver}
+                      onDragEnter={handleSearchDragEnter}
+                      onDragLeave={handleSearchDragLeave}
+                      onDrop={handleSearchImageDrop}
+                      className={`border border-dashed bg-neutral-950/50 hover:bg-neutral-950 rounded-xl py-3.5 px-4 text-center cursor-pointer transition-all ${
+                        isDragOverSearch ? "border-emerald-500 bg-neutral-900/40" : "border-neutral-800 hover:border-neutral-700"
+                      }`}
                     >
-                      <span className="text-xs text-neutral-500 font-medium">Click to upload image query</span>
+                      <span className="text-xs text-neutral-500 font-medium">
+                        {isDragOverSearch ? "Drop image here" : "Click or drag image query here"}
+                      </span>
                       <input
                         ref={searchFileRef}
                         type="file"
@@ -435,15 +492,29 @@ function App() {
 
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <h2 className="text-lg font-bold text-neutral-200">Catalog Inventory ({products.length} Items)</h2>
+                <h2 className="text-lg font-bold text-neutral-200">
+                  {hasSearched ? `Search Results (${products.length} Items)` : "Catalog Inventory"}
+                </h2>
                 {products.length > 0 && products[0].similarity !== undefined && (
-                  <span className="text-xs text-neutral-500 font-medium">Sorted by angular proximity</span>
+                  <span className="text-xs text-neutral-500 font-medium">Sorted by similarity threshold ({imageQuery ? "60%+" : "48%+"})</span>
                 )}
               </div>
 
-              {products.length === 0 ? (
+              {!hasSearched ? (
+                <div className="border border-neutral-900 bg-neutral-900/10 rounded-2xl py-16 text-center text-neutral-400 text-sm flex flex-col items-center justify-center space-y-3">
+                  <div className="p-3 rounded-full bg-neutral-900 text-neutral-600 border border-neutral-800">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-neutral-300">Catalog Search</h3>
+                    <p className="text-xs text-neutral-500 mt-1 max-w-xs mx-auto">Enter a text query or upload an image query above to search matches.</p>
+                  </div>
+                </div>
+              ) : products.length === 0 ? (
                 <div className="border border-neutral-900 bg-neutral-950 rounded-2xl py-12 text-center text-neutral-500 text-sm">
-                  No products found matching query metrics.
+                  No products found matching query metrics ({imageQuery ? "60%" : "48"}% match threshold).
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -606,9 +677,17 @@ function App() {
                 ) : (
                   <div
                     onClick={() => uploadFileRef.current?.click()}
-                    className="border-2 border-dashed border-neutral-800 hover:border-neutral-700 bg-neutral-950/30 hover:bg-neutral-950 rounded-xl py-12 text-center cursor-pointer transition-all"
+                    onDragOver={handleDragOver}
+                    onDragEnter={handleUploadDragEnter}
+                    onDragLeave={handleUploadDragLeave}
+                    onDrop={handleUploadImageDrop}
+                    className={`border-2 border-dashed bg-neutral-950/30 hover:bg-neutral-950 rounded-xl py-12 text-center cursor-pointer transition-all ${
+                      isDragOverUpload ? "border-emerald-500 bg-neutral-900/40" : "border-neutral-800 hover:border-neutral-700"
+                    }`}
                   >
-                    <span className="text-sm text-neutral-500 font-semibold block mb-1">Drag and drop or click to upload</span>
+                    <span className="text-sm text-neutral-500 font-semibold block mb-1">
+                      {isDragOverUpload ? "Drop product image here" : "Drag and drop or click to upload"}
+                    </span>
                     <span className="text-xs text-neutral-600 block">Accepts image files up to 10MB</span>
                     <input
                       ref={uploadFileRef}

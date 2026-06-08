@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS products (
     image_url TEXT NOT NULL,
     ai_description TEXT,
     extracted_attributes JSONB,
-    embedding_coordinates VECTOR(3072),
+    embedding_coordinates VECTOR(1024),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

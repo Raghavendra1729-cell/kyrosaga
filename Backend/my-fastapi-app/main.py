@@ -145,17 +145,20 @@ async def search_products(
     try:
         records = await Database.fetch(full_query, *params)
         results = []
+        min_similarity = 0.60 if image_bytes is not None else 0.48
         for row in records:
-            results.append({
-                "id": str(row["id"]),
-                "title": row["title"],
-                "price": float(row["price"]),
-                "inventory_count": row["inventory_count"],
-                "image_url": row["image_url"],
-                "ai_description": row["ai_description"],
-                "extracted_attributes": json.loads(row["extracted_attributes"]) if isinstance(row["extracted_attributes"], str) else row["extracted_attributes"],
-                "similarity": float(row["similarity"])
-            })
+            similarity = float(row["similarity"])
+            if similarity >= min_similarity:
+                results.append({
+                    "id": str(row["id"]),
+                    "title": row["title"],
+                    "price": float(row["price"]),
+                    "inventory_count": row["inventory_count"],
+                    "image_url": row["image_url"],
+                    "ai_description": row["ai_description"],
+                    "extracted_attributes": json.loads(row["extracted_attributes"]) if isinstance(row["extracted_attributes"], str) else row["extracted_attributes"],
+                    "similarity": similarity
+                })
         return results
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database execution failed: {str(e)}")
