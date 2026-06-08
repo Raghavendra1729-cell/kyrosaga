@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 import time
 import asyncio
 from typing import Any
-from fastapi import FastAPI, HTTPException, UploadFile, File, Form
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -191,10 +191,18 @@ async def search_products(
         raise HTTPException(status_code=500, detail=f"Database execution failed: {str(e)}")
 
 @app.get("/api/products")
-async def list_products() -> list[dict[str, Any]]:
-    query = "SELECT id, title, price, inventory_count, image_url, ai_description, extracted_attributes FROM products ORDER BY created_at DESC"
+async def list_products(
+    limit: int = Query(50, ge=1, le=100),
+    offset: int = Query(0, ge=0)
+) -> list[dict[str, Any]]:
+    query = """
+        SELECT id, title, price, inventory_count, image_url, ai_description, extracted_attributes 
+        FROM products 
+        ORDER BY created_at DESC 
+        LIMIT $1 OFFSET $2
+    """
     try:
-        records = await Database.fetch(query)
+        records = await Database.fetch(query, limit, offset)
         results = []
         for row in records:
             results.append({
