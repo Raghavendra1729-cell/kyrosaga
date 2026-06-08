@@ -10,7 +10,7 @@ Kyrosaga is an automated product catalog management and semantic search applicat
 graph TD
     Client[React Frontend] -->|1. Search Request / Upload| Backend[FastAPI Server]
     
-    subgraph Ingestion Pipeline (LangGraph)
+    subgraph "Ingestion Pipeline (LangGraph)"
         Backend -->|2. Trigger| Compress[1. Compress Image Node]
         Compress -->|3. Compress to WebP| Parse[2. Parse Properties Node]
         Parse -->|4. Visual Attribute Extraction via Visual Parser| Embed[3. Embed Features Node]

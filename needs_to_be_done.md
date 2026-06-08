@@ -6,17 +6,17 @@ This document outlines the planned future features, cloud migrations, deployment
 
 ```mermaid
 graph TD
-    subgraph Phase 1: Storage Integrations
+    subgraph "Phase 1: Storage Integrations"
         A[Implement Supabase Storage Driver] --> B[Test Cloudflare R2 Production Bucket]
     end
     
-    subgraph Phase 2: Cloud Deployment
+    subgraph "Phase 2: Cloud Deployment"
         B --> C[Deploy Postgres DB to Supabase Cloud]
         C --> D[Deploy FastAPI Backend to Fly.io or Render]
         D --> E[Deploy React Frontend to Vercel or Netlify]
     end
     
-    subgraph Phase 3: Telemetry and Analytics
+    subgraph "Phase 3: Telemetry and Analytics"
         E --> F[Implement Telemetry Log Event Collection]
         F --> G[Analyze Query Latency & Similarity Distributions]
         G --> H[Optimize Dynamic Threshold Models]
