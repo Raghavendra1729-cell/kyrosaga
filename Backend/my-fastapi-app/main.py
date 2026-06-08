@@ -1,6 +1,8 @@
 import os
 import json
 from contextlib import asynccontextmanager
+import time
+import asyncio
 from typing import Any
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
@@ -8,8 +10,10 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from config import settings
 from db import Database
+from storage import get_storage_driver
 from graph import build_ingestion_graph, ProductIngestionState
 from embeddings import generate_product_embedding
+from analytics import log_search_event
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -87,6 +91,8 @@ async def search_products(
     material_type: str | None = Form(None),
     shape: str | None = Form(None)
 ) -> list[dict[str, Any]]:
+    start_time = time.time()
+    
     if not text_query and not image_query:
         raise HTTPException(status_code=400, detail="At least one query signal (text or image) must be provided")
         
@@ -159,6 +165,27 @@ async def search_products(
                     "extracted_attributes": json.loads(row["extracted_attributes"]) if isinstance(row["extracted_attributes"], str) else row["extracted_attributes"],
                     "similarity": similarity
                 })
+        
+        # Telemetry logging
+        processing_latency_ms = int((time.time() - start_time) * 1000)
+        matched_product_ids = [res["id"] for res in results]
+        similarity_scores = [res["similarity"] for res in results]
+        result_count = len(results)
+        is_zero_result = result_count == 0
+        
+        # We don't want telemetry errors to break search
+        asyncio.create_task(log_search_event(
+            session_id=None, # To be added later if needed
+            query_text=text_query,
+            has_image_query=image_bytes is not None,
+            matched_product_ids=matched_product_ids,
+            similarity_scores=similarity_scores,
+            applied_threshold=min_similarity,
+            processing_latency_ms=processing_latency_ms,
+            result_count=result_count,
+            is_zero_result=is_zero_result
+        ))
+        
         return results
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database execution failed: {str(e)}")
@@ -201,5 +228,144 @@ async def get_product(product_id: str) -> dict[str, Any]:
         }
     except HTTPException:
         raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.put("/api/products/{product_id}")
+async def update_product(
+    product_id: str,
+    title: str | None = Form(None),
+    price: float | None = Form(None),
+    inventory_count: int | None = Form(None),
+    file: UploadFile | None = File(None)
+) -> dict[str, Any]:
+    # Check if product exists
+    query_check = "SELECT * FROM products WHERE id = $1"
+    existing = await Database.fetchrow(query_check, product_id)
+    if not existing:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    # If new image is uploaded, we run the ingestion pipeline logic
+    if file:
+        file_bytes = await file.read()
+        if len(file_bytes) > 10 * 1024 * 1024:
+            raise HTTPException(status_code=400, detail="File size exceeds 10MB limit")
+        
+        # We reuse the graph for the ingestion part, but we need to update the DB manually 
+        # since graph.sync_node does an INSERT. We can just skip sync_node or do the steps manually.
+        # It's cleaner to do the steps manually here to avoid duplicating graph state logic.
+        from image_compression import compress_image
+        import uuid
+        from parser import parse_product_image
+        
+        # 1. Compress
+        compressed = compress_image(file_bytes)
+        filename = f"{uuid.uuid4()}.webp"
+        driver = get_storage_driver()
+        url = await driver.upload_file(compressed, filename, "permanent_catalog/")
+        
+        # 2. Parse
+        attributes = await parse_product_image(compressed)
+        
+        # 3. Embed
+        final_title = title if title is not None else existing["title"]
+        text_content = f"{final_title} {attributes.colour or ''} {attributes.style or ''} {attributes.material_type or ''} {attributes.shape or ''} {attributes.description or ''}"
+        vector = await generate_product_embedding(text_content, compressed)
+        vector_str = f"[{','.join(str(val) for val in vector)}]"
+        
+        # 4. Update DB with new image and embeddings
+        attributes_dict = {
+            "colour": attributes.colour,
+            "style": attributes.style,
+            "material_type": attributes.material_type,
+            "shape": attributes.shape
+        }
+        
+        update_query = """
+            UPDATE products 
+            SET title = COALESCE($1, title), 
+                price = COALESCE($2, price), 
+                inventory_count = COALESCE($3, inventory_count),
+                image_url = $4,
+                ai_description = $5,
+                extracted_attributes = $6,
+                embedding_coordinates = $7::vector,
+                updated_at = NOW()
+            WHERE id = $8
+        """
+        await Database.execute(
+            update_query,
+            title, price, inventory_count,
+            url, attributes.description, json.dumps(attributes_dict), vector_str,
+            product_id
+        )
+        
+        # Optionally delete old image
+        try:
+            old_url = existing["image_url"]
+            await driver.delete_file(old_url)
+        except Exception:
+            pass
+
+    else:
+        # Just update text fields
+        update_query = """
+            UPDATE products 
+            SET title = COALESCE($1, title), 
+                price = COALESCE($2, price), 
+                inventory_count = COALESCE($3, inventory_count),
+                updated_at = NOW()
+            WHERE id = $4
+        """
+        await Database.execute(update_query, title, price, inventory_count, product_id)
+
+    return {"status": "success", "message": "Product updated successfully"}
+
+@app.delete("/api/products/{product_id}")
+async def delete_product(product_id: str) -> dict[str, Any]:
+    query_check = "SELECT image_url FROM products WHERE id = $1"
+    existing = await Database.fetchrow(query_check, product_id)
+    if not existing:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    # Delete from DB
+    delete_query = "DELETE FROM products WHERE id = $1"
+    await Database.execute(delete_query, product_id)
+
+    # Delete image from storage
+    try:
+        driver = get_storage_driver()
+        await driver.delete_file(existing["image_url"])
+    except Exception as e:
+        import logging
+        logging.warning(f"Failed to delete image for product {product_id}: {e}")
+
+    return {"status": "success", "message": "Product deleted successfully"}
+
+@app.get("/api/analytics/summary")
+async def get_analytics_summary() -> dict[str, Any]:
+    query = """
+        SELECT 
+            COUNT(*) as total_searches,
+            SUM(CASE WHEN is_zero_result THEN 1 ELSE 0 END) as zero_result_searches,
+            AVG(processing_latency_ms) as avg_latency_ms
+        FROM search_telemetry
+    """
+    try:
+        row = await Database.fetchrow(query)
+        if not row:
+            return {"total_searches": 0, "zero_result_rate": 0.0, "avg_latency_ms": 0.0}
+            
+        total_searches = row["total_searches"] or 0
+        zero_result_searches = row["zero_result_searches"] or 0
+        avg_latency_ms = float(row["avg_latency_ms"]) if row["avg_latency_ms"] is not None else 0.0
+        
+        zero_result_rate = (zero_result_searches / total_searches) if total_searches > 0 else 0.0
+        
+        return {
+            "total_searches": total_searches,
+            "zero_result_rate": round(zero_result_rate, 4),
+            "avg_latency_ms": round(avg_latency_ms, 2)
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
