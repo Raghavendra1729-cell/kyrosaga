@@ -7,12 +7,6 @@ type Theme = "cobalt" | "lime"
 type Mode = "light" | "dark"
 type FilterKey = "minStock" | "colour" | "style" | "material" | "shape"
 
-interface BackendStatus {
-  message: string
-  storageDriver: string
-  modelId: string
-}
-
 interface Product {
   id: string
   title: string
@@ -47,9 +41,6 @@ function MS({ name, size = 22, fill = false, className = "" }: { name: string; s
 }
 
 function App() {
-  const [status, setStatus] = useState<BackendStatus | null>(null)
-  const [statusError, setStatusError] = useState<string | null>(null)
-
   const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem("k-theme") as Theme) || "cobalt")
   const [mode, setMode] = useState<Mode>(() => (localStorage.getItem("k-mode") as Mode) || "light")
 
@@ -86,10 +77,6 @@ function App() {
   const searchFileRef = useRef<HTMLInputElement>(null)
   const uploadFileRef = useRef<HTMLInputElement>(null)
   const filterRowRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    fetchStatus()
-  }, [])
 
   useEffect(() => {
     const body = document.body
@@ -130,25 +117,6 @@ function App() {
     window.addEventListener("keydown", onKey)
     return () => window.removeEventListener("keydown", onKey)
   }, [selectedProduct, uploadOpen, uploadLoading])
-
-  const fetchStatus = () => {
-    fetch(`${settings.apiBaseUrl}/`)
-      .then((res) => {
-        if (!res.ok) throw new Error("Backend connection offline")
-        return res.json()
-      })
-      .then((data) => {
-        setStatus({
-          message: data.message,
-          storageDriver: data.storage_driver,
-          modelId: data.model_id,
-        })
-        setStatusError(null)
-      })
-      .catch((err) => {
-        setStatusError(err instanceof Error ? err.message : "Unknown error")
-      })
-  }
 
   const loadInitialProducts = () => {
     setSearchLoading(true)
@@ -385,31 +353,6 @@ function App() {
             </div>
 
             <div className="flex items-center gap-3 flex-wrap justify-center">
-              {statusError ? (
-                <div className="k-status-chip err">
-                  <MS name="error" size={16} fill />
-                  <span>Backend Connection Offline</span>
-                </div>
-              ) : status ? (
-                <div className="k-status-chip">
-                  <div className="flex items-center gap-2">
-                    <span className="k-status-dot" />
-                    <span className="k-status-label">{status.message}</span>
-                  </div>
-                  <div>
-                    Storage: <span className="k-mono">{status.storageDriver}</span>
-                  </div>
-                  <div>
-                    Model: <span className="k-mono">{status.modelId}</span>
-                  </div>
-                </div>
-              ) : (
-                <div className="k-status-chip">
-                  <MS name="sync" size={16} />
-                  Synchronizing status...
-                </div>
-              )}
-
               <div className="k-seg" role="group" aria-label="Theme">
                 <button
                   type="button"
