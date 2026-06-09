@@ -28,12 +28,19 @@ class LocalStorageDriver:
         return f"{settings.local_asset_serve_url}{file_key}"
 
     async def delete_file(self, file_key: str) -> None:
-        # file_key might be the full URL or just the filename, we assume it's just the filename or path relative to local_storage_path
-        # if it contains the url prefix, strip it
+        # file_key might be the full URL or just a filename/path relative to local_storage_path
         prefix = settings.local_asset_serve_url
         if file_key.startswith(prefix):
             file_key = file_key[len(prefix):]
-        file_path = os.path.join(settings.local_storage_path, file_key)
+            
+        # Prevent absolute-path joins and path traversal outside local_storage_path
+        base_path = os.path.abspath(settings.local_storage_path)
+        rel_path = os.path.normpath(file_key).lstrip(os.sep)
+        file_path = os.path.abspath(os.path.join(base_path, rel_path))
+        
+        if not file_path.startswith(base_path + os.sep):
+            raise ValueError("Invalid file path")
+            
         if os.path.exists(file_path):
             os.remove(file_path)
 

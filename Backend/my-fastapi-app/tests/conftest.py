@@ -11,9 +11,10 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 from main import app
 
 @pytest.fixture
-def client():
-    # In a real test suite, you'd override dependencies here to prevent real DB calls.
-    # For now, we return a TestClient.
+def client(mocker):
+    # Prevent real DB connections during tests
+    mocker.patch('db.Database.connect', new_callable=mocker.AsyncMock)
+    mocker.patch('db.Database.disconnect', new_callable=mocker.AsyncMock)
     return TestClient(app)
 
 @pytest.fixture
