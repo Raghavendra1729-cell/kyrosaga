@@ -13,6 +13,7 @@ from db import Database
 from storage import get_storage_driver
 from graph import build_ingestion_graph, ProductIngestionState
 from embeddings import generate_product_embedding
+from image_compression import compress_image
 from analytics import log_search_event
 
 @asynccontextmanager
@@ -98,7 +99,13 @@ async def search_products(
         
     image_bytes = None
     if image_query:
-        image_bytes = await image_query.read()
+        raw_image_bytes = await image_query.read()
+        if len(raw_image_bytes) > 10 * 1024 * 1024:
+            raise HTTPException(status_code=400, detail="Image size exceeds 10MB limit")
+        try:
+            image_bytes = compress_image(raw_image_bytes)
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Invalid image file: {str(e)}")
         
     text_payload = text_query or ""
     
