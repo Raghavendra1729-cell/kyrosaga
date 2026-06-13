@@ -1,0 +1,68 @@
+/* ============================================================================
+   OXIDE DESIGN SYSTEM — ROOT STYLESHEET
+   colors_and_type.css · import this one file to get the whole token system.
+   ----------------------------------------------------------------------------
+   Layers:  tokens/color.css   → tonal palettes + semantic color roles + state
+            tokens/type.css    → M3 type scale + .md-* utility classes
+            tokens/shape-motion.css → shape · spacing · elevation · motion
+   Apply a theme by putting a class on <body> or any wrapper:
+       <body class="theme-cobalt">                     light, blue seed
+       <body class="theme-lime" data-mode="dark">       dark, lime seed
+   ========================================================================== */
+@import './tokens/color.css';
+@import './tokens/type.css';
+@import './tokens/shape-motion.css';
+
+/* ---------------------------------------------------------------------------
+   BASE — surfaces paint from tokens so a theme swap reflows the whole page.
+--------------------------------------------------------------------------- */
+.theme-cobalt, .theme-lime {
+  background-color: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
+  font-family: var(--md-sys-typescale-plain);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* ---------------------------------------------------------------------------
+   SEMANTIC ELEMENT STYLES — sensible defaults mapped onto the type scale.
+   Use these or the .md-* utility classes interchangeably.
+--------------------------------------------------------------------------- */
+.md-prose h1 { font: var(--md-sys-typescale-headline-large-weight) var(--md-sys-typescale-headline-large-size)/var(--md-sys-typescale-headline-large-line) var(--md-sys-typescale-brand); margin: 0 0 0.5em; }
+.md-prose h2 { font: var(--md-sys-typescale-headline-small-weight) var(--md-sys-typescale-headline-small-size)/var(--md-sys-typescale-headline-small-line) var(--md-sys-typescale-brand); margin: 1em 0 0.4em; }
+.md-prose h3 { font: 500 var(--md-sys-typescale-title-large-size)/var(--md-sys-typescale-title-large-line) var(--md-sys-typescale-brand); margin: 1em 0 0.4em; }
+.md-prose p  { font: 400 var(--md-sys-typescale-body-large-size)/var(--md-sys-typescale-body-large-line) var(--md-sys-typescale-plain); letter-spacing: 0.5px; margin: 0 0 1em; color: var(--md-sys-color-on-surface-variant); text-wrap: pretty; }
+.md-prose code, .md-prose kbd { font-family: var(--md-sys-typescale-mono); font-size: 0.9em; background: var(--md-sys-color-surface-container-high); padding: 2px 6px; border-radius: var(--md-sys-shape-extra-small); }
+.md-prose a { color: var(--md-sys-color-primary); text-decoration: none; }
+.md-prose a:hover { text-decoration: underline; }
+
+/* ---------------------------------------------------------------------------
+   STATE LAYER — the M3 interaction primitive. Put .md-state on a positioned
+   element; it overlays a tinted ::after at the right fixed opacity. Override
+   --md-state-color for primary-tinted controls.
+--------------------------------------------------------------------------- */
+.md-state { position: relative; --md-state-color: var(--md-sys-color-on-surface); }
+.md-state::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit;
+  background: var(--md-state-color); opacity: 0; pointer-events: none;
+  transition: opacity var(--md-sys-motion-dur-short) var(--md-sys-motion-standard);
+}
+.md-state:hover::after   { opacity: var(--md-sys-state-hover-opacity); }
+.md-state:focus-visible::after { opacity: var(--md-sys-state-focus-opacity); }
+.md-state:active::after  { opacity: var(--md-sys-state-pressed-opacity); }
+
+/* ---------------------------------------------------------------------------
+   RIPPLE — Material's non-negotiable touch feedback. JS adds a .md-ripple span
+   at the click point; this animates it. (See components for the helper.)
+--------------------------------------------------------------------------- */
+.md-ripple-host { position: relative; overflow: hidden; }
+.md-ripple {
+  position: absolute; border-radius: 50%; transform: scale(0);
+  background: currentColor; opacity: 0.18; pointer-events: none;
+  animation: md-ripple var(--md-sys-motion-dur-extra) var(--md-sys-motion-standard);
+}
+@keyframes md-ripple { to { transform: scale(2.6); opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}

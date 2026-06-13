@@ -1,0 +1,63 @@
+/* ============================================================================
+   OXIDE DESIGN SYSTEM — TYPE SCALE (Material 3)
+   ----------------------------------------------------------------------------
+   M3 ships 5 roles × 3 sizes = 15 styles. Each role pairs a font, weight,
+   size, line-height and tracking. Brand calls for Google Sans (UI) / Google
+   Sans Display (hero) / Roboto Flex (dense data). Those are not freely
+   distributable — Oxide ships the open Google families instead:
+       Google Sans          → Roboto Flex     (UI + display)
+       Google Sans Display  → Roboto Flex      (marketing/hero, optical>28)
+       Roboto Flex (dense)  → Roboto Flex      (tables, data)
+       mono                 → Roboto Mono
+   Swap the @font-face / --md-sys-typescale-*-font values if you license the
+   real Google Sans fonts. Sizes/line-heights below match the M3 spec exactly.
+---------------------------------------------------------------------------- */
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,300..800&family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@400;500&display=swap');
+
+:root {
+  --md-sys-typescale-brand:  "Roboto Flex", "Google Sans", system-ui, sans-serif; /* @kind font */
+  --md-sys-typescale-plain:  "Roboto Flex", "Roboto", system-ui, sans-serif; /* @kind font */
+  --md-sys-typescale-mono:   "Roboto Mono", ui-monospace, monospace; /* @kind font */
+
+  /* DISPLAY — hero / marketing. opsz pushed high for the display optical cut. */
+  --md-sys-typescale-display-large-size: 57px;   --md-sys-typescale-display-large-line: 64px;   --md-sys-typescale-display-large-tracking: -0.25px; --md-sys-typescale-display-large-weight: 400;
+  --md-sys-typescale-display-medium-size: 45px;  --md-sys-typescale-display-medium-line: 52px;  --md-sys-typescale-display-medium-tracking: 0;      --md-sys-typescale-display-medium-weight: 400;
+  --md-sys-typescale-display-small-size: 36px;   --md-sys-typescale-display-small-line: 44px;   --md-sys-typescale-display-small-tracking: 0;       --md-sys-typescale-display-small-weight: 400;
+
+  /* HEADLINE — high-emphasis section heads */
+  --md-sys-typescale-headline-large-size: 32px;  --md-sys-typescale-headline-large-line: 40px;  --md-sys-typescale-headline-large-tracking: 0;      --md-sys-typescale-headline-large-weight: 400;
+  --md-sys-typescale-headline-medium-size: 28px; --md-sys-typescale-headline-medium-line: 36px; --md-sys-typescale-headline-medium-tracking: 0;     --md-sys-typescale-headline-medium-weight: 400;
+  --md-sys-typescale-headline-small-size: 24px;  --md-sys-typescale-headline-small-line: 32px;  --md-sys-typescale-headline-small-tracking: 0;      --md-sys-typescale-headline-small-weight: 400;
+
+  /* TITLE — card / dialog / app-bar titles. medium+ is the M3 "Google Sans 500" voice. */
+  --md-sys-typescale-title-large-size: 22px;     --md-sys-typescale-title-large-line: 28px;     --md-sys-typescale-title-large-tracking: 0;         --md-sys-typescale-title-large-weight: 400;
+  --md-sys-typescale-title-medium-size: 16px;    --md-sys-typescale-title-medium-line: 24px;    --md-sys-typescale-title-medium-tracking: 0.15px;   --md-sys-typescale-title-medium-weight: 500;
+  --md-sys-typescale-title-small-size: 14px;     --md-sys-typescale-title-small-line: 20px;     --md-sys-typescale-title-small-tracking: 0.1px;     --md-sys-typescale-title-small-weight: 500;
+
+  /* BODY — running text. body-medium (14/20) is the workhorse. */
+  --md-sys-typescale-body-large-size: 16px;      --md-sys-typescale-body-large-line: 24px;      --md-sys-typescale-body-large-tracking: 0.5px;      --md-sys-typescale-body-large-weight: 400;
+  --md-sys-typescale-body-medium-size: 14px;     --md-sys-typescale-body-medium-line: 20px;     --md-sys-typescale-body-medium-tracking: 0.25px;    --md-sys-typescale-body-medium-weight: 400;
+  --md-sys-typescale-body-small-size: 12px;      --md-sys-typescale-body-small-line: 16px;      --md-sys-typescale-body-small-tracking: 0.4px;      --md-sys-typescale-body-small-weight: 400;
+
+  /* LABEL — buttons, chips, nav, tabs. Always 500. */
+  --md-sys-typescale-label-large-size: 14px;     --md-sys-typescale-label-large-line: 20px;     --md-sys-typescale-label-large-tracking: 0.1px;     --md-sys-typescale-label-large-weight: 500;
+  --md-sys-typescale-label-medium-size: 12px;    --md-sys-typescale-label-medium-line: 16px;    --md-sys-typescale-label-medium-tracking: 0.5px;    --md-sys-typescale-label-medium-weight: 500;
+  --md-sys-typescale-label-small-size: 11px;     --md-sys-typescale-label-small-line: 16px;     --md-sys-typescale-label-small-tracking: 0.5px;     --md-sys-typescale-label-small-weight: 500;
+}
+
+/* Utility classes — apply a full typescale role in one shot. */
+.md-display-large { font-family: var(--md-sys-typescale-brand); font-size: var(--md-sys-typescale-display-large-size); line-height: var(--md-sys-typescale-display-large-line); letter-spacing: var(--md-sys-typescale-display-large-tracking); font-weight: var(--md-sys-typescale-display-large-weight); }
+.md-display-medium { font-family: var(--md-sys-typescale-brand); font-size: var(--md-sys-typescale-display-medium-size); line-height: var(--md-sys-typescale-display-medium-line); font-weight: 400; }
+.md-display-small { font-family: var(--md-sys-typescale-brand); font-size: var(--md-sys-typescale-display-small-size); line-height: var(--md-sys-typescale-display-small-line); font-weight: 400; }
+.md-headline-large { font-family: var(--md-sys-typescale-brand); font-size: var(--md-sys-typescale-headline-large-size); line-height: var(--md-sys-typescale-headline-large-line); font-weight: 400; }
+.md-headline-medium { font-family: var(--md-sys-typescale-brand); font-size: var(--md-sys-typescale-headline-medium-size); line-height: var(--md-sys-typescale-headline-medium-line); font-weight: 400; }
+.md-headline-small { font-family: var(--md-sys-typescale-brand); font-size: var(--md-sys-typescale-headline-small-size); line-height: var(--md-sys-typescale-headline-small-line); font-weight: 400; }
+.md-title-large { font-family: var(--md-sys-typescale-brand); font-size: var(--md-sys-typescale-title-large-size); line-height: var(--md-sys-typescale-title-large-line); font-weight: 400; }
+.md-title-medium { font-family: var(--md-sys-typescale-brand); font-size: var(--md-sys-typescale-title-medium-size); line-height: var(--md-sys-typescale-title-medium-line); letter-spacing: var(--md-sys-typescale-title-medium-tracking); font-weight: 500; }
+.md-title-small { font-family: var(--md-sys-typescale-brand); font-size: var(--md-sys-typescale-title-small-size); line-height: var(--md-sys-typescale-title-small-line); letter-spacing: var(--md-sys-typescale-title-small-tracking); font-weight: 500; }
+.md-body-large { font-family: var(--md-sys-typescale-plain); font-size: var(--md-sys-typescale-body-large-size); line-height: var(--md-sys-typescale-body-large-line); letter-spacing: var(--md-sys-typescale-body-large-tracking); font-weight: 400; }
+.md-body-medium { font-family: var(--md-sys-typescale-plain); font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line); letter-spacing: var(--md-sys-typescale-body-medium-tracking); font-weight: 400; }
+.md-body-small { font-family: var(--md-sys-typescale-plain); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line); letter-spacing: var(--md-sys-typescale-body-small-tracking); font-weight: 400; }
+.md-label-large { font-family: var(--md-sys-typescale-brand); font-size: var(--md-sys-typescale-label-large-size); line-height: var(--md-sys-typescale-label-large-line); letter-spacing: var(--md-sys-typescale-label-large-tracking); font-weight: 500; }
+.md-label-medium { font-family: var(--md-sys-typescale-brand); font-size: var(--md-sys-typescale-label-medium-size); line-height: var(--md-sys-typescale-label-medium-line); letter-spacing: var(--md-sys-typescale-label-medium-tracking); font-weight: 500; }
+.md-label-small { font-family: var(--md-sys-typescale-brand); font-size: var(--md-sys-typescale-label-small-size); line-height: var(--md-sys-typescale-label-small-line); letter-spacing: var(--md-sys-typescale-label-small-tracking); font-weight: 500; }

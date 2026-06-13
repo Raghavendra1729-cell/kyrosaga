@@ -1,0 +1,58 @@
+/* ============================================================================
+   OXIDE DESIGN SYSTEM — SHAPE · ELEVATION · MOTION · SPACING
+   ========================================================================== */
+
+:root {
+  /* ---- SHAPE SCALE (M3) ---- corner radii. "full" = stadium/pill. */
+  --md-sys-shape-none:        0px;
+  --md-sys-shape-extra-small: 4px;
+  --md-sys-shape-small:       8px;
+  --md-sys-shape-medium:      12px;
+  --md-sys-shape-large:       16px;
+  --md-sys-shape-extra-large: 28px;
+  --md-sys-shape-full:        999px;   /* pills, FABs, toggles, chips */
+
+  /* ---- SPACING ---- everything lands on a 4pt grid ---- */
+  --md-sys-spacing-1: 4px;   --md-sys-spacing-2: 8px;   --md-sys-spacing-3: 12px;
+  --md-sys-spacing-4: 16px;  --md-sys-spacing-5: 20px;  --md-sys-spacing-6: 24px;
+  --md-sys-spacing-8: 32px;  --md-sys-spacing-10: 40px; --md-sys-spacing-12: 48px;
+  --md-sys-spacing-14: 56px; --md-sys-spacing-16: 64px;
+
+  /* ---- BREAKPOINTS (window size classes) ---- */
+  --md-sys-bp-compact: 0px;       /* phone     — nav BAR at bottom */
+  --md-sys-bp-medium:  600px;     /* large phone / small tablet */
+  --md-sys-bp-expanded:840px;     /* tablet    — nav RAIL */
+  --md-sys-bp-large:   1240px;    /* desktop   — nav DRAWER */
+
+  /* ---- ELEVATION ---- M3 elevation is COLOR, not shadow. These soft shadows
+     are used sparingly (FAB, menus, snackbars) for separation from scroll
+     content; the primary cue is always the surface-container tonal step. ---- */
+  --md-sys-elevation-0: none;
+  --md-sys-elevation-1: 0px 1px 2px 0px rgba(0,0,0,0.30), 0px 1px 3px 1px rgba(0,0,0,0.15);
+  --md-sys-elevation-2: 0px 1px 2px 0px rgba(0,0,0,0.30), 0px 2px 6px 2px rgba(0,0,0,0.15);
+  --md-sys-elevation-3: 0px 1px 3px 0px rgba(0,0,0,0.30), 0px 4px 8px 3px rgba(0,0,0,0.15);
+  --md-sys-elevation-4: 0px 2px 3px 0px rgba(0,0,0,0.30), 0px 6px 10px 4px rgba(0,0,0,0.15);
+  --md-sys-elevation-5: 0px 4px 4px 0px rgba(0,0,0,0.30), 0px 8px 12px 6px rgba(0,0,0,0.15);
+  /* In LIGHT mode the soft shadows are even lighter — the kit uses 6% black. */
+  --md-sys-elevation-soft: 0px 2px 4px 0px rgba(0,0,0,0.06);
+
+  /* ---- MOTION ---- M3 spring/easing system ---- */
+  /* Emphasized — large, hero, spatial transitions */
+  --md-sys-motion-emphasized:            cubic-bezier(0.2, 0, 0, 1.0); /* @kind other */
+  --md-sys-motion-emphasized-decelerate: cubic-bezier(0.05, 0.7, 0.1, 1.0); /* @kind other */
+  --md-sys-motion-emphasized-accelerate: cubic-bezier(0.3, 0.0, 0.8, 0.15); /* @kind other */
+  /* Standard — most UI */
+  --md-sys-motion-standard:              cubic-bezier(0.2, 0, 0, 1.0); /* @kind other */
+  --md-sys-motion-standard-decelerate:   cubic-bezier(0, 0, 0, 1); /* @kind other */
+  --md-sys-motion-standard-accelerate:   cubic-bezier(0.3, 0, 1, 1); /* @kind other */
+
+  --md-sys-motion-dur-short:    200ms;  /* @kind other */
+  --md-sys-motion-dur-medium:   300ms;  /* @kind other */
+  --md-sys-motion-dur-long:     400ms;  /* @kind other */
+  --md-sys-motion-dur-extra:    500ms; /* @kind other */
+
+  /* Ready-to-use compositions */
+  --md-easing-decelerate: var(--md-sys-motion-dur-short) var(--md-sys-motion-standard-decelerate); /* @kind other */
+  --md-easing-standard:   var(--md-sys-motion-dur-medium) var(--md-sys-motion-standard); /* @kind other */
+  --md-easing-emphasized: var(--md-sys-motion-dur-long) var(--md-sys-motion-emphasized); /* @kind other */
+}

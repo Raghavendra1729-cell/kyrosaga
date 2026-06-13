@@ -1,1 +1,891 @@
 @import "tailwindcss";
+@import "./oxide/colors_and_type.css";
+
+/* ============================================================================
+   KYROSAGA · M3 utility classes layered on Oxide DS tokens.
+   These wrap surface roles, pill shapes, state layers and ripple targets so the
+   Tailwind layout utilities can stay in App.tsx without hardcoded colour.
+   ========================================================================== */
+
+html, body, #root { height: 100%; }
+body {
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
+  font-family: var(--md-sys-typescale-plain);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  margin: 0;
+}
+
+/* Material Symbols Rounded icon helper */
+.msr {
+  font-family: 'Material Symbols Rounded';
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'opsz' 24;
+}
+.msr.fill { font-variation-settings: 'FILL' 1, 'wght' 400, 'opsz' 24; }
+
+/* ---------------------------------------------------------------------------
+   Top app bar + brand wordmark
+--------------------------------------------------------------------------- */
+.k-appbar {
+  background: color-mix(in oklab, var(--md-sys-color-surface) 80%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
+}
+.k-wordmark {
+  font-family: var(--md-sys-typescale-brand);
+  font-weight: 600;
+  letter-spacing: -0.5px;
+  font-size: 26px;
+  background: linear-gradient(135deg, var(--md-sys-color-primary), var(--md-sys-color-tertiary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.k-sub {
+  font: 500 11px/16px var(--md-sys-typescale-brand);
+  letter-spacing: 0.5px;
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+/* Oxide brand blob mark — two organic blobs in primary/tertiary */
+.k-mark { position: relative; flex-shrink: 0; }
+.k-mark .b1 {
+  position: absolute; inset: 0;
+  border-radius: 46% 54% 58% 42% / 52% 44% 56% 48%;
+  background: var(--md-sys-color-primary);
+}
+.k-mark .b2 {
+  position: absolute; inset: 22%;
+  border-radius: 54% 46% 42% 58% / 46% 56% 44% 54%;
+  background: var(--md-sys-color-tertiary);
+  mix-blend-mode: multiply;
+  opacity: 0.85;
+}
+
+/* ---------------------------------------------------------------------------
+   Status strip (kept intentionally — debug chrome is intentional)
+--------------------------------------------------------------------------- */
+.k-status-chip {
+  display: inline-flex; align-items: center; gap: 16px;
+  height: 36px; padding: 0 16px;
+  background: var(--md-sys-color-surface-container);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-sys-shape-full);
+  font: 400 12px var(--md-sys-typescale-plain);
+  color: var(--md-sys-color-on-surface-variant);
+}
+.k-status-chip .k-status-label { color: var(--md-sys-color-on-surface); font-weight: 500; }
+.k-status-chip .k-mono { font-family: var(--md-sys-typescale-mono); font-size: 11px; color: var(--md-sys-color-on-surface); }
+.k-status-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--md-sys-color-tertiary);
+  animation: k-pulse 2s ease-in-out infinite;
+}
+.k-status-chip.err {
+  background: var(--md-sys-color-error-container);
+  border-color: transparent;
+  color: var(--md-sys-color-on-error-container);
+}
+@keyframes k-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ---------------------------------------------------------------------------
+   Icon button (top-bar & toolbar) — round, state-layer hover
+--------------------------------------------------------------------------- */
+.k-icon-btn {
+  width: 42px; height: 42px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 0; padding: 0; cursor: pointer;
+  background: transparent;
+  color: var(--md-sys-color-on-surface-variant);
+  border-radius: 50%;
+  position: relative; overflow: hidden;
+  transition: background var(--md-sys-motion-dur-short) var(--md-sys-motion-standard);
+}
+.k-icon-btn:hover { background: var(--md-sys-color-surface-container-high); }
+.k-icon-btn.on {
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+}
+
+/* ---------------------------------------------------------------------------
+   Segmented toggle (theme switcher, mode switcher)
+--------------------------------------------------------------------------- */
+.k-seg {
+  display: inline-flex;
+  background: var(--md-sys-color-surface-container-high);
+  border-radius: var(--md-sys-shape-full);
+  padding: 4px;
+  gap: 2px;
+}
+.k-seg-btn {
+  height: 34px; padding: 0 14px;
+  display: inline-flex; align-items: center; gap: 6px;
+  border: 0; background: transparent; cursor: pointer;
+  color: var(--md-sys-color-on-surface-variant);
+  font: 500 13px var(--md-sys-typescale-brand);
+  border-radius: var(--md-sys-shape-full);
+  position: relative; overflow: hidden;
+  transition: background var(--md-sys-motion-dur-short) var(--md-sys-motion-standard),
+              color var(--md-sys-motion-dur-short) var(--md-sys-motion-standard);
+}
+.k-seg-btn:hover { background: var(--md-sys-color-surface-container-highest); }
+.k-seg-btn.on {
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+}
+
+/* ---------------------------------------------------------------------------
+   Tabs (Search · Upload primary tab strip)
+--------------------------------------------------------------------------- */
+.k-tabs {
+  display: inline-flex;
+  background: var(--md-sys-color-surface-container);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-sys-shape-full);
+  padding: 4px;
+  gap: 4px;
+}
+.k-tab {
+  height: 40px; padding: 0 22px;
+  display: inline-flex; align-items: center; gap: 8px;
+  border: 0; background: transparent; cursor: pointer;
+  color: var(--md-sys-color-on-surface-variant);
+  font: 500 14px var(--md-sys-typescale-brand);
+  letter-spacing: 0.1px;
+  border-radius: var(--md-sys-shape-full);
+  position: relative; overflow: hidden;
+  transition: background var(--md-sys-motion-dur-short) var(--md-sys-motion-standard),
+              color var(--md-sys-motion-dur-short) var(--md-sys-motion-standard);
+}
+.k-tab:hover { background: var(--md-sys-color-surface-container-high); }
+.k-tab.on {
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+  box-shadow: var(--md-sys-elevation-soft);
+}
+
+/* ---------------------------------------------------------------------------
+   Surface cards (search form, upload form, results panel, status banners)
+--------------------------------------------------------------------------- */
+.k-surface {
+  background: var(--md-sys-color-surface-container-low);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-sys-shape-extra-large);
+}
+.k-surface-flat {
+  background: var(--md-sys-color-surface-container);
+  border-radius: var(--md-sys-shape-large);
+}
+
+/* Section label — replaces uppercase tracking-wider eyebrows */
+.k-eyebrow {
+  font: 500 12px var(--md-sys-typescale-brand);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--md-sys-color-on-surface-variant);
+}
+.k-section-title {
+  font: 500 16px/24px var(--md-sys-typescale-brand);
+  color: var(--md-sys-color-on-surface);
+}
+
+/* ---------------------------------------------------------------------------
+   Text fields — pill at large size for the search bar, M3 outlined-ish for forms
+--------------------------------------------------------------------------- */
+.k-pill-field {
+  display: flex; align-items: center; gap: 10px;
+  height: 56px; padding: 0 8px 0 22px;
+  background: var(--md-sys-color-surface-container-high);
+  border-radius: var(--md-sys-shape-full);
+  transition: background var(--md-sys-motion-dur-short) var(--md-sys-motion-standard),
+              box-shadow var(--md-sys-motion-dur-short) var(--md-sys-motion-standard);
+}
+.k-pill-field:focus-within {
+  background: var(--md-sys-color-surface-container-lowest);
+  box-shadow: var(--md-sys-elevation-2);
+}
+.k-pill-field input {
+  flex: 1; min-width: 0;
+  border: 0; outline: 0; background: transparent;
+  font: 400 16px var(--md-sys-typescale-plain);
+  color: var(--md-sys-color-on-surface);
+}
+.k-pill-field input::placeholder { color: var(--md-sys-color-on-surface-variant); }
+
+.k-field {
+  display: flex; align-items: center;
+  width: 100%; height: 48px; padding: 0 16px;
+  background: var(--md-sys-color-surface-container-low);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-sys-shape-small);
+  font: 400 14px var(--md-sys-typescale-plain);
+  color: var(--md-sys-color-on-surface);
+  transition: border-color var(--md-sys-motion-dur-short) var(--md-sys-motion-standard),
+              background var(--md-sys-motion-dur-short) var(--md-sys-motion-standard);
+}
+.k-field:focus, .k-field:focus-within {
+  outline: 0;
+  border-color: var(--md-sys-color-primary);
+  background: var(--md-sys-color-surface-container-lowest);
+}
+.k-field::placeholder { color: var(--md-sys-color-on-surface-variant); }
+
+.k-field-dense {
+  height: 40px;
+  padding: 0 12px;
+  font: 400 13px var(--md-sys-typescale-plain);
+  border-radius: var(--md-sys-shape-small);
+}
+
+/* ---------------------------------------------------------------------------
+   Buttons — filled (primary CTA), tonal (secondary), text
+--------------------------------------------------------------------------- */
+.k-btn-filled {
+  display: inline-flex; align-items: center; gap: 8px;
+  height: 44px; padding: 0 24px;
+  border: 0; cursor: pointer;
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+  border-radius: var(--md-sys-shape-full);
+  font: 500 14px var(--md-sys-typescale-brand);
+  letter-spacing: 0.1px;
+  box-shadow: var(--md-sys-elevation-soft);
+  position: relative; overflow: hidden;
+  transition: box-shadow var(--md-sys-motion-dur-short) var(--md-sys-motion-standard),
+              background var(--md-sys-motion-dur-short) var(--md-sys-motion-standard);
+}
+.k-btn-filled:hover:not(:disabled) { box-shadow: var(--md-sys-elevation-1); }
+.k-btn-filled:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.k-btn-tonal {
+  display: inline-flex; align-items: center; gap: 8px;
+  height: 40px; padding: 0 20px;
+  border: 0; cursor: pointer;
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+  border-radius: var(--md-sys-shape-full);
+  font: 500 14px var(--md-sys-typescale-brand);
+  position: relative; overflow: hidden;
+  transition: background var(--md-sys-motion-dur-short) var(--md-sys-motion-standard);
+}
+.k-btn-tonal:hover {
+  background: color-mix(in oklab, var(--md-sys-color-secondary-container) 88%, var(--md-sys-color-on-secondary-container) 12%);
+}
+
+.k-btn-text {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 36px; padding: 0 14px;
+  border: 0; cursor: pointer;
+  background: transparent;
+  color: var(--md-sys-color-primary);
+  border-radius: var(--md-sys-shape-full);
+  font: 500 13px var(--md-sys-typescale-brand);
+  position: relative; overflow: hidden;
+}
+.k-btn-text:hover { background: color-mix(in oklab, var(--md-sys-color-primary) 8%, transparent); }
+
+.k-btn-danger {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 36px; padding: 0 16px;
+  border: 0; cursor: pointer;
+  background: var(--md-sys-color-error-container);
+  color: var(--md-sys-color-on-error-container);
+  border-radius: var(--md-sys-shape-full);
+  font: 500 13px var(--md-sys-typescale-brand);
+}
+
+/* ---------------------------------------------------------------------------
+   Chips — M3 assist/suggestion chips (similarity %, extracted attributes)
+--------------------------------------------------------------------------- */
+.k-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 28px; padding: 0 12px;
+  background: var(--md-sys-color-surface-container);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  color: var(--md-sys-color-on-surface);
+  border-radius: var(--md-sys-shape-small);
+  font: 500 12px var(--md-sys-typescale-brand);
+}
+.k-chip-tonal {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 28px; padding: 0 12px;
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+  border-radius: var(--md-sys-shape-small);
+  font: 500 12px var(--md-sys-typescale-brand);
+}
+.k-chip-primary {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 28px; padding: 0 12px;
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+  border-radius: var(--md-sys-shape-small);
+  font: 500 12px var(--md-sys-typescale-brand);
+}
+.k-chip-tertiary {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 28px; padding: 0 12px;
+  background: var(--md-sys-color-tertiary-container);
+  color: var(--md-sys-color-on-tertiary-container);
+  border-radius: var(--md-sys-shape-small);
+  font: 500 12px var(--md-sys-typescale-brand);
+}
+
+/* Similarity badge — floats over product card thumbnails */
+.k-match-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 10px;
+  background: color-mix(in oklab, var(--md-sys-color-surface) 80%, transparent);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-sys-shape-full);
+  color: var(--md-sys-color-tertiary);
+  font: 600 11px var(--md-sys-typescale-brand);
+}
+
+/* ---------------------------------------------------------------------------
+   Product card
+--------------------------------------------------------------------------- */
+.k-product-card {
+  background: var(--md-sys-color-surface-container-low);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-sys-shape-large);
+  overflow: hidden;
+  cursor: pointer;
+  transition: background var(--md-sys-motion-dur-short) var(--md-sys-motion-standard),
+              border-color var(--md-sys-motion-dur-short) var(--md-sys-motion-standard),
+              box-shadow var(--md-sys-motion-dur-short) var(--md-sys-motion-standard);
+}
+.k-product-card:hover {
+  background: var(--md-sys-color-surface-container);
+  border-color: var(--md-sys-color-outline);
+}
+.k-product-card.expanded {
+  border-color: var(--md-sys-color-primary);
+  box-shadow: var(--md-sys-elevation-1);
+}
+.k-product-thumb {
+  height: 240px;
+  background: var(--md-sys-color-surface-container-high);
+  position: relative; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px;
+}
+.k-product-thumb img {
+  max-width: 100%; max-height: 100%;
+  width: auto; height: auto;
+  object-fit: contain;
+  transition: transform 500ms var(--md-sys-motion-emphasized);
+}
+.k-product-card:hover .k-product-thumb img { transform: scale(1.04); }
+
+/* Attribute rows — extracted attributes can be sentence-length, so render as
+   label/value rows rather than fixed-height chips. */
+.k-attr-row {
+  display: grid;
+  grid-template-columns: 78px 1fr;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
+  align-items: baseline;
+}
+.k-attr-row:last-child { border-bottom: 0; }
+.k-attr-label {
+  font: 500 11px var(--md-sys-typescale-brand);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--md-sys-color-on-surface-variant);
+}
+.k-attr-value {
+  font: 400 13px/19px var(--md-sys-typescale-plain);
+  color: var(--md-sys-color-on-surface);
+  text-wrap: pretty;
+}
+
+/* When attribute rows sit inside a tonal banner, inherit the banner's on-color
+   instead of the page's on-surface, so contrast stays consistent. */
+.k-banner-success .k-attr-row,
+.k-banner-error .k-attr-row {
+  border-bottom-color: color-mix(in oklab, currentColor 20%, transparent);
+}
+.k-banner-success .k-attr-label,
+.k-banner-error .k-attr-label {
+  color: color-mix(in oklab, currentColor 72%, transparent);
+}
+.k-banner-success .k-attr-value,
+.k-banner-error .k-attr-value {
+  color: currentColor;
+}
+
+/* ---------------------------------------------------------------------------
+   Drag-and-drop zones
+--------------------------------------------------------------------------- */
+.k-drop {
+  border: 1.5px dashed var(--md-sys-color-outline-variant);
+  background: var(--md-sys-color-surface-container-low);
+  border-radius: var(--md-sys-shape-large);
+  text-align: center; cursor: pointer;
+  transition: background var(--md-sys-motion-dur-short) var(--md-sys-motion-standard),
+              border-color var(--md-sys-motion-dur-short) var(--md-sys-motion-standard);
+}
+.k-drop:hover { background: var(--md-sys-color-surface-container); border-color: var(--md-sys-color-outline); }
+.k-drop.active {
+  border-color: var(--md-sys-color-primary);
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+}
+
+/* ---------------------------------------------------------------------------
+   Status banners (error, success, pipeline running)
+--------------------------------------------------------------------------- */
+.k-banner-error {
+  padding: 16px 20px;
+  background: var(--md-sys-color-error-container);
+  color: var(--md-sys-color-on-error-container);
+  border-radius: var(--md-sys-shape-medium);
+  font: 400 13px var(--md-sys-typescale-mono);
+}
+.k-banner-success {
+  padding: 20px;
+  background: var(--md-sys-color-tertiary-container);
+  color: var(--md-sys-color-on-tertiary-container);
+  border-radius: var(--md-sys-shape-medium);
+}
+.k-banner-pipeline {
+  padding: 16px 20px;
+  background: var(--md-sys-color-surface-container);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-sys-shape-medium);
+}
+.k-banner-pipeline .k-pipe-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--md-sys-color-primary);
+  animation: k-ping 1.4s ease-in-out infinite;
+}
+@keyframes k-ping {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.6); opacity: 0.5; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ---------------------------------------------------------------------------
+   Empty state
+--------------------------------------------------------------------------- */
+.k-empty {
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+  padding: 64px 24px;
+  background: var(--md-sys-color-surface-container-low);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-sys-shape-extra-large);
+  text-align: center;
+}
+.k-empty-ic {
+  width: 56px; height: 56px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  background: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+/* ---------------------------------------------------------------------------
+   Footer
+--------------------------------------------------------------------------- */
+.k-footer {
+  border-top: 1px solid var(--md-sys-color-outline-variant);
+  color: var(--md-sys-color-on-surface-variant);
+  background: var(--md-sys-color-surface);
+  font: 400 12px var(--md-sys-typescale-plain);
+}
+
+/* ---------------------------------------------------------------------------
+   Hero search bar — multimodal pill: drag/drop image, type, lens, submit
+--------------------------------------------------------------------------- */
+.k-hero-search {
+  display: flex; align-items: center; gap: 8px;
+  width: 100%;
+  min-height: 64px;
+  padding: 8px 8px 8px 22px;
+  background: var(--md-sys-color-surface-container-high);
+  border-radius: var(--md-sys-shape-full);
+  border: 1px solid transparent;
+  transition: background var(--md-sys-motion-dur-short) var(--md-sys-motion-standard),
+              box-shadow var(--md-sys-motion-dur-short) var(--md-sys-motion-standard),
+              border-color var(--md-sys-motion-dur-short) var(--md-sys-motion-standard);
+}
+.k-hero-search:focus-within {
+  background: var(--md-sys-color-surface-container-lowest);
+  box-shadow: var(--md-sys-elevation-2);
+}
+.k-hero-search.dragging {
+  background: var(--md-sys-color-primary-container);
+  border-color: var(--md-sys-color-primary);
+}
+.k-hero-search input {
+  flex: 1; min-width: 0;
+  border: 0; outline: 0; background: transparent;
+  font: 400 16px var(--md-sys-typescale-plain);
+  color: var(--md-sys-color-on-surface);
+}
+.k-hero-search input::placeholder { color: var(--md-sys-color-on-surface-variant); }
+.k-hero-search .k-img-attach {
+  display: inline-flex; align-items: center; gap: 8px;
+  height: 40px; padding: 4px 8px 4px 4px;
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+  border-radius: var(--md-sys-shape-full);
+  flex-shrink: 0;
+  font: 500 12px var(--md-sys-typescale-brand);
+  max-width: 200px;
+}
+.k-hero-search .k-img-attach img {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.k-hero-search .k-img-attach .k-img-name {
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  min-width: 0;
+}
+.k-hero-search .k-img-attach button {
+  width: 28px; height: 28px;
+  border: 0; padding: 0; cursor: pointer;
+  background: transparent; color: inherit;
+  border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.k-hero-search .k-img-attach button:hover {
+  background: color-mix(in oklab, currentColor 12%, transparent);
+}
+.k-hero-search .k-hs-icon {
+  width: 44px; height: 44px;
+  border: 0; padding: 0; cursor: pointer;
+  background: transparent;
+  color: var(--md-sys-color-on-surface-variant);
+  border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: background var(--md-sys-motion-dur-short) var(--md-sys-motion-standard);
+}
+.k-hero-search .k-hs-icon:hover { background: var(--md-sys-color-surface-container-highest); }
+.k-hero-search .k-hs-icon.lens { color: var(--md-sys-color-tertiary); }
+.k-hero-search .k-hs-submit {
+  height: 48px; padding: 0 22px;
+  border: 0; cursor: pointer;
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+  border-radius: var(--md-sys-shape-full);
+  font: 500 14px var(--md-sys-typescale-brand);
+  display: inline-flex; align-items: center; gap: 8px;
+  flex-shrink: 0;
+  transition: box-shadow var(--md-sys-motion-dur-short) var(--md-sys-motion-standard);
+}
+.k-hero-search .k-hs-submit:hover:not(:disabled) { box-shadow: var(--md-sys-elevation-1); }
+.k-hero-search .k-hs-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ---------------------------------------------------------------------------
+   Filter chips — chip row beneath the hero search bar.
+   Each chip is a button. Setting a value lights it tonal; clicking opens a popover.
+--------------------------------------------------------------------------- */
+.k-filter-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.k-filter-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 36px; padding: 0 14px;
+  border: 1px solid var(--md-sys-color-outline-variant);
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface-variant);
+  border-radius: var(--md-sys-shape-small);
+  font: 500 13px var(--md-sys-typescale-brand);
+  cursor: pointer;
+  position: relative;
+  transition: background var(--md-sys-motion-dur-short) var(--md-sys-motion-standard),
+              border-color var(--md-sys-motion-dur-short) var(--md-sys-motion-standard),
+              color var(--md-sys-motion-dur-short) var(--md-sys-motion-standard);
+}
+.k-filter-chip:hover { background: var(--md-sys-color-surface-container); }
+.k-filter-chip.set {
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+  border-color: transparent;
+}
+.k-filter-chip .k-fc-clear {
+  width: 20px; height: 20px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  border: 0; background: transparent; color: inherit; cursor: pointer;
+  padding: 0;
+}
+.k-filter-chip .k-fc-clear:hover { background: color-mix(in oklab, currentColor 14%, transparent); }
+.k-filter-chip-wrap { position: relative; }
+.k-filter-popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 30;
+  min-width: 240px;
+  padding: 14px;
+  background: var(--md-sys-color-surface-container-high);
+  border-radius: var(--md-sys-shape-medium);
+  box-shadow: var(--md-sys-elevation-3);
+  animation: k-popover-in 0.18s var(--md-sys-motion-standard-decelerate);
+}
+@keyframes k-popover-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.k-filter-popover label {
+  display: block;
+  font: 500 11px var(--md-sys-typescale-brand);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--md-sys-color-on-surface-variant);
+  margin-bottom: 6px;
+}
+.k-filter-popover .k-popover-actions {
+  display: flex; justify-content: flex-end; gap: 6px;
+  margin-top: 10px;
+}
+
+/* ---------------------------------------------------------------------------
+   Detail panel — slide-in right rail when a result is selected.
+   Bottom sheet on narrow viewports.
+--------------------------------------------------------------------------- */
+.k-detail-scrim {
+  position: fixed; inset: 0; z-index: 50;
+  background: color-mix(in oklab, var(--md-sys-color-scrim) 32%, transparent);
+  backdrop-filter: blur(2px);
+  animation: k-fade-in 0.18s var(--md-sys-motion-standard-decelerate);
+}
+@keyframes k-fade-in { from { opacity: 0; } to { opacity: 1; } }
+.k-detail-panel {
+  position: fixed; top: 0; right: 0; bottom: 0;
+  width: min(440px, 96vw); z-index: 51;
+  background: var(--md-sys-color-surface);
+  border-left: 1px solid var(--md-sys-color-outline-variant);
+  display: flex; flex-direction: column;
+  animation: k-slidein 0.32s var(--md-sys-motion-emphasized);
+}
+@keyframes k-slidein {
+  from { transform: translateX(40px); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+.k-detail-head {
+  display: flex; align-items: center; gap: 10px;
+  padding: 16px 16px 12px;
+}
+.k-detail-head h3 {
+  flex: 1; margin: 0;
+  font: 500 18px var(--md-sys-typescale-brand);
+  letter-spacing: 0.15px;
+  color: var(--md-sys-color-on-surface);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.k-detail-body {
+  flex: 1; overflow-y: auto;
+  padding: 0 20px 24px;
+}
+.k-detail-hero {
+  height: 260px;
+  background: var(--md-sys-color-surface-container-high);
+  border-radius: var(--md-sys-shape-large);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  margin-bottom: 18px;
+}
+.k-detail-hero img { max-width: 100%; max-height: 100%; object-fit: contain; }
+@media (max-width: 600px) {
+  .k-detail-panel {
+    top: auto; left: 0; width: 100%;
+    height: 88vh;
+    border-left: 0;
+    border-top-left-radius: var(--md-sys-shape-extra-large);
+    border-top-right-radius: var(--md-sys-shape-extra-large);
+    animation: k-slideup 0.32s var(--md-sys-motion-emphasized);
+  }
+  @keyframes k-slideup {
+    from { transform: translateY(40px); opacity: 0; }
+    to { transform: none; opacity: 1; }
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   FAB — Add product trigger
+--------------------------------------------------------------------------- */
+.k-fab {
+  position: fixed;
+  right: 28px;
+  bottom: 28px;
+  z-index: 40;
+  display: inline-flex; align-items: center; gap: 10px;
+  height: 56px; padding: 0 22px;
+  border: 0; cursor: pointer;
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+  border-radius: var(--md-sys-shape-large);
+  box-shadow: var(--md-sys-elevation-3);
+  font: 500 14px var(--md-sys-typescale-brand);
+  letter-spacing: 0.1px;
+  transition: box-shadow var(--md-sys-motion-dur-short) var(--md-sys-motion-standard),
+              transform var(--md-sys-motion-dur-short) var(--md-sys-motion-standard);
+}
+.k-fab:hover { box-shadow: var(--md-sys-elevation-4); transform: translateY(-1px); }
+.k-fab:active { transform: translateY(0); }
+
+/* ---------------------------------------------------------------------------
+   Modal sheet (used for the Add Product upload form)
+--------------------------------------------------------------------------- */
+.k-modal-scrim {
+  position: fixed; inset: 0; z-index: 60;
+  background: color-mix(in oklab, var(--md-sys-color-scrim) 40%, transparent);
+  backdrop-filter: blur(3px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+  animation: k-fade-in 0.2s var(--md-sys-motion-standard-decelerate);
+}
+.k-modal-card {
+  width: 100%;
+  max-width: 720px;
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  background: var(--md-sys-color-surface-container-low);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-sys-shape-extra-large);
+  padding: 24px 28px 28px;
+  box-shadow: var(--md-sys-elevation-5);
+  animation: k-modal-in 0.28s var(--md-sys-motion-emphasized);
+}
+@keyframes k-modal-in {
+  from { transform: scale(0.96) translateY(12px); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+.k-modal-head {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 20px;
+}
+.k-modal-head h2 {
+  flex: 1; margin: 0;
+  font: 500 22px/28px var(--md-sys-typescale-brand);
+  letter-spacing: 0.15px;
+  color: var(--md-sys-color-on-surface);
+}
+
+/* ---------------------------------------------------------------------------
+   Example query chip — shown in the empty state
+--------------------------------------------------------------------------- */
+.k-example-chip {
+  display: inline-flex; align-items: center; gap: 8px;
+  height: 40px; padding: 0 18px;
+  border: 1px solid var(--md-sys-color-outline-variant);
+  background: var(--md-sys-color-surface-container-low);
+  color: var(--md-sys-color-on-surface);
+  border-radius: var(--md-sys-shape-full);
+  font: 400 14px var(--md-sys-typescale-plain);
+  cursor: pointer;
+  transition: background var(--md-sys-motion-dur-short) var(--md-sys-motion-standard),
+              border-color var(--md-sys-motion-dur-short) var(--md-sys-motion-standard);
+}
+.k-example-chip:hover {
+  background: var(--md-sys-color-surface-container);
+  border-color: var(--md-sys-color-outline);
+}
+.k-example-chip .msr { color: var(--md-sys-color-primary); }
+
+/* ---------------------------------------------------------------------------
+   Markdown prose — renders the Gemini-generated catalog profile
+--------------------------------------------------------------------------- */
+.k-md-prose { color: var(--md-sys-color-on-surface); }
+.k-md-prose h1, .k-md-prose h2, .k-md-prose h3, .k-md-prose h4, .k-md-prose h5, .k-md-prose h6 {
+  font-family: var(--md-sys-typescale-brand);
+  color: var(--md-sys-color-on-surface);
+  margin: 16px 0 6px;
+  letter-spacing: 0;
+  font-weight: 500;
+  line-height: 1.3;
+}
+.k-md-prose h1:first-child, .k-md-prose h2:first-child, .k-md-prose h3:first-child,
+.k-md-prose h4:first-child, .k-md-prose h5:first-child, .k-md-prose h6:first-child { margin-top: 0; }
+.k-md-prose h1 { font-size: 20px; }
+.k-md-prose h2 { font-size: 17px; }
+.k-md-prose h3 { font-size: 15px; }
+.k-md-prose h4 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--md-sys-color-on-surface-variant); }
+.k-md-prose h5, .k-md-prose h6 { font-size: 13px; color: var(--md-sys-color-on-surface-variant); }
+.k-md-prose p {
+  font: 400 13px/20px var(--md-sys-typescale-plain);
+  letter-spacing: 0.15px;
+  margin: 0 0 10px;
+  color: var(--md-sys-color-on-surface-variant);
+  text-wrap: pretty;
+}
+.k-md-prose strong { color: var(--md-sys-color-on-surface); font-weight: 600; }
+.k-md-prose em { color: var(--md-sys-color-on-surface); }
+.k-md-prose ul, .k-md-prose ol {
+  margin: 0 0 12px;
+  padding-left: 22px;
+  font: 400 13px/20px var(--md-sys-typescale-plain);
+  color: var(--md-sys-color-on-surface-variant);
+}
+.k-md-prose li { margin: 4px 0; }
+.k-md-prose li::marker { color: var(--md-sys-color-primary); }
+.k-md-prose code {
+  font-family: var(--md-sys-typescale-mono);
+  font-size: 12px;
+  background: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-on-surface);
+  padding: 1px 6px;
+  border-radius: var(--md-sys-shape-extra-small);
+}
+.k-md-prose pre {
+  background: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-on-surface);
+  padding: 12px 14px;
+  border-radius: var(--md-sys-shape-small);
+  overflow-x: auto;
+  font: 400 12px/18px var(--md-sys-typescale-mono);
+  margin: 0 0 12px;
+}
+.k-md-prose pre code { background: transparent; padding: 0; }
+.k-md-prose blockquote {
+  margin: 0 0 12px;
+  padding: 6px 14px;
+  border-left: 3px solid var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-surface-variant);
+  background: var(--md-sys-color-surface-container);
+  border-radius: 0 var(--md-sys-shape-small) var(--md-sys-shape-small) 0;
+}
+.k-md-prose a { color: var(--md-sys-color-primary); text-decoration: none; }
+.k-md-prose a:hover { text-decoration: underline; }
+.k-md-prose hr { border: 0; border-top: 1px solid var(--md-sys-color-outline-variant); margin: 14px 0; }
+.k-md-prose > *:last-child { margin-bottom: 0; }
+
+/* Inside the success banner, markdown prose should adopt the banner on-color. */
+.k-banner-success .k-md-prose,
+.k-banner-success .k-md-prose h1, .k-banner-success .k-md-prose h2, .k-banner-success .k-md-prose h3,
+.k-banner-success .k-md-prose h4, .k-banner-success .k-md-prose h5, .k-banner-success .k-md-prose h6,
+.k-banner-success .k-md-prose strong, .k-banner-success .k-md-prose em { color: currentColor; }
+.k-banner-success .k-md-prose p,
+.k-banner-success .k-md-prose ul,
+.k-banner-success .k-md-prose ol { color: color-mix(in oklab, currentColor 85%, transparent); }
+.k-banner-success .k-md-prose code,
+.k-banner-success .k-md-prose pre { background: color-mix(in oklab, currentColor 12%, transparent); color: currentColor; }
+.k-banner-success .k-md-prose blockquote { border-left-color: currentColor; background: color-mix(in oklab, currentColor 8%, transparent); }
+.k-banner-success .k-md-prose li::marker { color: currentColor; }
+
+/* ---------------------------------------------------------------------------
+   Misc text helpers
+--------------------------------------------------------------------------- */
+.k-mono { font-family: var(--md-sys-typescale-mono); }
+.k-on-surface { color: var(--md-sys-color-on-surface); }
+.k-on-surface-variant { color: var(--md-sys-color-on-surface-variant); }
+.k-on-primary { color: var(--md-sys-color-primary); }
+.k-on-tertiary { color: var(--md-sys-color-tertiary); }
+.k-divider { border-top: 1px solid var(--md-sys-color-outline-variant); }
