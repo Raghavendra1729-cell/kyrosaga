@@ -10,6 +10,8 @@ class StorageDriver(Protocol):
         ...
     async def get_public_url(self, file_key: str) -> str:
         ...
+    async def delete_file(self, file_key: str) -> None:
+        ...
 
 class LocalStorageDriver:
     async def upload_file(self, file_bytes: bytes, filename: str, directory_prefix: str) -> str:
@@ -24,6 +26,23 @@ class LocalStorageDriver:
 
     async def get_public_url(self, file_key: str) -> str:
         return f"{settings.local_asset_serve_url}{file_key}"
+
+    async def delete_file(self, file_key: str) -> None:
+        # file_key might be the full URL or just a filename/path relative to local_storage_path
+        prefix = settings.local_asset_serve_url
+        if file_key.startswith(prefix):
+            file_key = file_key[len(prefix):]
+            
+        # Prevent absolute-path joins and path traversal outside local_storage_path
+        base_path = os.path.abspath(settings.local_storage_path)
+        rel_path = os.path.normpath(file_key).lstrip(os.sep)
+        file_path = os.path.abspath(os.path.join(base_path, rel_path))
+        
+        if not file_path.startswith(base_path + os.sep):
+            raise ValueError("Invalid file path")
+            
+        if os.path.exists(file_path):
+            os.remove(file_path)
 
 class R2StorageDriver:
     async def upload_file(self, file_bytes: bytes, filename: str, directory_prefix: str) -> str:
@@ -67,6 +86,25 @@ class R2StorageDriver:
 
     async def get_public_url(self, file_key: str) -> str:
         return f"{settings.r2_public_url}/{file_key}"
+
+    async def delete_file(self, file_key: str) -> None:
+        import boto3
+        from botocore.config import Config
+        s3 = boto3.client(
+            "s3",
+            endpoint_url=f"https://{settings.r2_account_id}.r2.cloudflarestorage.com",
+            aws_access_key_id=settings.r2_access_key_id,
+            aws_secret_access_key=settings.r2_secret_access_key,
+            config=Config(signature_version="s3v4")
+        )
+        prefix = f"{settings.r2_public_url}/"
+        if file_key.startswith(prefix):
+            file_key = file_key[len(prefix):]
+            
+        s3.delete_object(
+            Bucket=settings.r2_bucket_name,
+            Key=file_key
+        )
 
 def get_storage_driver() -> StorageDriver:
     if settings.storage_driver == "r2":
