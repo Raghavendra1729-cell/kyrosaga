@@ -80,3 +80,21 @@ Apply local Supabase Postgres migrations:
 ```bash
 npx supabase start
 ```
+
+## Cloud Deployment (Hugging Face Spaces)
+
+This project has been dockerized for easy deployment to Hugging Face Spaces.
+
+### 1. Environment Variables needed in Cloud (HF Secrets)
+To run this in the cloud, you will need the following API keys and URLs:
+- `GEMINI_API_KEY`: Your Google Gemini API Key.
+- `DATABASE_URL`: A cloud PostgreSQL connection string (e.g., from Supabase Cloud) with `pgvector` enabled.
+- `STORAGE_DRIVER`: Set this to `r2` for cloud storage.
+- `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`, `R2_PUBLIC_URL`: Your Cloudflare R2 credentials for image storage.
+- *(Optional)* `POSTHOG_API_KEY`, `POSTHOG_HOST`, `VITE_POSTHOG_API_KEY`, `VITE_POSTHOG_HOST` for analytics.
+
+### 2. GitHub Actions (Health Ping)
+A GitHub Action workflow is included in `.github/workflows/health-ping.yml` that will ping the `/api/health` endpoint daily. 
+To enable this:
+1. Add a secret `SPACE_URL` in your GitHub repository pointing to your HF Space URL (e.g., `https://username-spacename.hf.space`).
+2. The action will automatically run every 24 hours to ensure your space stays awake.

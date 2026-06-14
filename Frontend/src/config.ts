@@ -13,9 +13,9 @@ const getEnvVar = (name: string, isRequired = true): string => {
 }
 
 export const settings: EnvSettings = {
-  apiBaseUrl: getEnvVar("VITE_API_BASE_URL"),
+  apiBaseUrl: getEnvVar("VITE_API_BASE_URL", false),
   posthogApiKey: getEnvVar("VITE_POSTHOG_API_KEY", false),
-  posthogHost: getEnvVar("VITE_POSTHOG_HOST"),
+  posthogHost: getEnvVar("VITE_POSTHOG_HOST", false),
 }
 
 export default settings

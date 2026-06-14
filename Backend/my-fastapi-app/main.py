@@ -40,8 +40,8 @@ class StatusResponse(BaseModel):
     storage_driver: str
     model_id: str
 
-@app.get("/")
-async def read_root() -> dict[str, str]:
+@app.get("/api/health")
+async def read_health() -> dict[str, str]:
     return {
         "message": "Kyrosaga Backend API is online for Bish",
         "storage_driver": settings.storage_driver,
@@ -384,3 +384,8 @@ async def get_analytics_summary() -> dict[str, Any]:
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+frontend_dist_path = os.path.join(os.path.dirname(__file__), "dist")
+if os.path.exists(frontend_dist_path):
+    app.mount("/", StaticFiles(directory=frontend_dist_path, html=True), name="frontend")
+

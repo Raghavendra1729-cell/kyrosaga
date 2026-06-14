@@ -1,0 +1,17 @@
+name: Ping Hugging Face Space
+
+on:
+  schedule:
+    # Runs every 24 hours to ensure it is pinged within any 36 hour window
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Space Health Endpoint
+        run: |
+          # The user will need to update the URL to point to their Hugging Face space
+          # Example: https://username-spacename.hf.space/api/health
+          curl -f ${{ secrets.SPACE_URL }}/api/health || echo "Failed to ping"
