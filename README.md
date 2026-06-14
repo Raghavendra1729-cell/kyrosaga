@@ -1,3 +1,12 @@
+---
+title: Kyrosaga
+emoji: 🛍️
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+pinned: false
+---
+
 # Kyrosaga
 
 Multimodal Product Catalogue Intelligence System
