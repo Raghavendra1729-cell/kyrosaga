@@ -1,7 +1,7 @@
 import asyncio
 from typing import List, Any
 import logging
-from db import Database
+from src.db import Database
 
 logger = logging.getLogger(__name__)
 

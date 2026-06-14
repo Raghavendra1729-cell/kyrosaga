@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
 from google import genai
 from google.genai import types
-from config import settings
+from src.config import settings
 
 class ProductAttributes(BaseModel):
     colour: str = Field(description="Dominant color and color scheme details")

@@ -8,13 +8,13 @@ from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-from config import settings
-from db import Database
-from storage import get_storage_driver
-from graph import build_ingestion_graph, ProductIngestionState
-from embeddings import generate_product_embedding
-from image_compression import compress_image
-from analytics import log_search_event
+from src.config import settings
+from src.db import Database
+from src.storage import get_storage_driver
+from src.graph import build_ingestion_graph, ProductIngestionState
+from src.embeddings import generate_product_embedding
+from src.image_compression import compress_image
+from src.analytics import log_search_event
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -270,9 +270,9 @@ async def update_product(
         # We reuse the graph for the ingestion part, but we need to update the DB manually 
         # since graph.sync_node does an INSERT. We can just skip sync_node or do the steps manually.
         # It's cleaner to do the steps manually here to avoid duplicating graph state logic.
-        from image_compression import compress_image
+        from src.image_compression import compress_image
         import uuid
-        from parser import parse_product_image
+        from src.parser import parse_product_image
         
         # 1. Compress
         compressed = compress_image(file_bytes)

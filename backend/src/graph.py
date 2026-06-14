@@ -3,11 +3,11 @@ import json
 from typing import Any
 from pydantic import BaseModel, Field
 from langgraph.graph import StateGraph, START, END
-from image_compression import compress_image
-from parser import parse_product_image
-from embeddings import generate_product_embedding
-from storage import get_storage_driver
-from db import Database
+from src.image_compression import compress_image
+from src.parser import parse_product_image
+from src.embeddings import generate_product_embedding
+from src.storage import get_storage_driver
+from src.db import Database
 
 class ProductIngestionState(BaseModel):
     raw_image: bytes

@@ -1,7 +1,7 @@
 from typing import Any
 from google import genai
 from google.genai import types
-from config import settings
+from src.config import settings
 
 async def generate_product_embedding(
     text_content: str,

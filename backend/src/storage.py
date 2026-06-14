@@ -1,6 +1,6 @@
 import os
 from typing import Protocol, runtime_checkable
-from config import settings
+from src.config import settings
 
 @runtime_checkable
 class StorageDriver(Protocol):

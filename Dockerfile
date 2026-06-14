@@ -16,16 +16,16 @@ WORKDIR /app
 # Copy the entire project
 COPY . .
 
-# Build Frontend
-WORKDIR /app/Frontend
+# Build frontend
+WORKDIR /app/frontend
 RUN npm install
 RUN npm run build
 
 # Move frontend build to backend directory so FastAPI can serve it
-RUN mv dist ../Backend/my-fastapi-app/dist
+RUN mv dist ../backend/dist
 
 # Setup Backend
-WORKDIR /app/Backend/my-fastapi-app
+WORKDIR /app/backend
 
 # Install Python dependencies from the root requirements.txt
 RUN pip install --no-cache-dir -r ../../requirements.txt

@@ -17,7 +17,7 @@ Kyrosaga is an automated product catalog management and semantic search applicat
 
 ```mermaid
 graph TD
-    Client[React Frontend] -->|1. Search Request / Upload| Backend[FastAPI Server]
+    Client[React frontend] -->|1. Search Request / Upload| Backend[FastAPI Server]
     
     subgraph "Ingestion Pipeline (LangGraph)"
         Backend -->|2. Trigger| Compress[1. Compress Image Node]
@@ -46,13 +46,13 @@ graph TD
 
 ## Core Codebase Structure
 
-- [main.py](file:///c:/Users/Bishwayan%20Chatterjee/Desktop/random/firse_webdev/rush-hours/genAI/Kyrosaga/Backend/my-fastapi-app/main.py): Exposes REST API endpoints for product searching, retrieval, and uploads.
-- [graph.py](file:///c:/Users/Bishwayan%20Chatterjee/Desktop/random/firse_webdev/rush-hours/genAI/Kyrosaga/Backend/my-fastapi-app/graph.py): Defines the product ingestion state graph using LangGraph.
-- [embeddings.py](file:///c:/Users/Bishwayan%20Chatterjee/Desktop/random/firse_webdev/rush-hours/genAI/Kyrosaga/Backend/my-fastapi-app/embeddings.py): Connects with the embedding API using Matryoshka Representation Learning (MRL) for 1024-dimensional joint vector generation.
-- [parser.py](file:///c:/Users/Bishwayan%20Chatterjee/Desktop/random/firse_webdev/rush-hours/genAI/Kyrosaga/Backend/my-fastapi-app/parser.py): Leverages the visual parser to extract properties (color, style, material, shape) and write descriptions.
-- [storage.py](file:///c:/Users/Bishwayan%20Chatterjee/Desktop/random/firse_webdev/rush-hours/genAI/Kyrosaga/Backend/my-fastapi-app/storage.py): Manages local disk and Cloudflare R2 object storage operations.
-- [db.py](file:///c:/Users/Bishwayan%20Chatterjee/Desktop/random/firse_webdev/rush-hours/genAI/Kyrosaga/Backend/my-fastapi-app/db.py): Handshakes with Postgres database using asynchronous pool configurations.
-- [App.tsx](file:///c:/Users/Bishwayan%20Chatterjee/Desktop/random/firse_webdev/rush-hours/genAI/Kyrosaga/Frontend/src/App.tsx): Interactive single-page React frontend dashboard.
+- [main.py](file:///c:/Users/Bishwayan%20Chatterjee/Desktop/random/firse_webdev/rush-hours/genAI/Kyrosaga/backend/main.py): Exposes REST API endpoints for product searching, retrieval, and uploads.
+- [graph.py](file:///c:/Users/Bishwayan%20Chatterjee/Desktop/random/firse_webdev/rush-hours/genAI/Kyrosaga/backend/graph.py): Defines the product ingestion state graph using LangGraph.
+- [embeddings.py](file:///c:/Users/Bishwayan%20Chatterjee/Desktop/random/firse_webdev/rush-hours/genAI/Kyrosaga/backend/embeddings.py): Connects with the embedding API using Matryoshka Representation Learning (MRL) for 1024-dimensional joint vector generation.
+- [parser.py](file:///c:/Users/Bishwayan%20Chatterjee/Desktop/random/firse_webdev/rush-hours/genAI/Kyrosaga/backend/parser.py): Leverages the visual parser to extract properties (color, style, material, shape) and write descriptions.
+- [storage.py](file:///c:/Users/Bishwayan%20Chatterjee/Desktop/random/firse_webdev/rush-hours/genAI/Kyrosaga/backend/storage.py): Manages local disk and Cloudflare R2 object storage operations.
+- [db.py](file:///c:/Users/Bishwayan%20Chatterjee/Desktop/random/firse_webdev/rush-hours/genAI/Kyrosaga/backend/db.py): Handshakes with Postgres database using asynchronous pool configurations.
+- [App.tsx](file:///c:/Users/Bishwayan%20Chatterjee/Desktop/random/firse_webdev/rush-hours/genAI/Kyrosaga/frontend/src/App.tsx): Interactive single-page React frontend dashboard.
 
 ## Setup and Installation
 
@@ -65,20 +65,20 @@ pip install -r requirements.txt
 
 Install node packages for the frontend:
 ```bash
-cd Frontend
+cd frontend
 npm install
 ```
 
 ### Running Backend Server
 
-From the directory Backend/my-fastapi-app:
+From the directory backend:
 ```bash
 fastapi dev main.py
 ```
 
-### Running Frontend Server
+### Running frontend Server
 
-From the directory Frontend:
+From the directory frontend:
 ```bash
 npm run dev
 ```

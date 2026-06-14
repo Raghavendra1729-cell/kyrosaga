@@ -1,6 +1,6 @@
 import asyncpg
 from typing import Any
-from config import settings
+from src.config import settings
 
 class Database:
     pool: asyncpg.Pool | None = None
