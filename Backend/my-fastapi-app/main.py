@@ -33,6 +33,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+os.makedirs(settings.local_storage_path, exist_ok=True)
 app.mount("/static", StaticFiles(directory=settings.local_storage_path), name="static")
 
 class StatusResponse(BaseModel):
