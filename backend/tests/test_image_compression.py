@@ -1,5 +1,5 @@
 import pytest
-from image_compression import compress_image
+from src.image_compression import compress_image
 
 def test_compress_image_success(sample_image_bytes):
     compressed = compress_image(sample_image_bytes)

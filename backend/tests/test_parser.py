@@ -1,5 +1,5 @@
 import pytest
-from parser import parse_product_image
+from src.parser import parse_product_image
 
 @pytest.mark.asyncio
 async def test_parse_product_image_success(sample_image_bytes, mock_gemini):
