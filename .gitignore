@@ -58,3 +58,4 @@ desktop.ini
 
 # Claude Code project metadata
 .claude/
+supabase/.temp/
