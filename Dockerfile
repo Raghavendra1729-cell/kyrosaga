@@ -28,7 +28,7 @@ RUN mv dist ../backend/dist
 WORKDIR /app/backend
 
 # Install Python dependencies from the root requirements.txt
-RUN pip install --no-cache-dir -r ../../requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Hugging Face Spaces exposes port 7860
 EXPOSE 7860
